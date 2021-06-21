@@ -4,14 +4,14 @@ Portable PHP class to create simple captchas.
 
 ## Installation
 
-You can use composer, or simply copy/paste the **Captcha** class.
+You can use composer, or download the contents of the **src** folder.
 
 ```bash
 composer require jacopovalanzano/php-captcha
 ```
 
 ## Usage
-Since the captcha is a binary jpeg image, it can be rendered with the "image/jpeg" content-type header;
+Since the captcha is a binary jpeg image, it can be rendered with the "image/jpeg" content-type header.
 ```php
     // Create a new Captcha
     $captcha = new Captcha("My super difficult to read string.");
@@ -32,7 +32,7 @@ Since the captcha is a binary jpeg image, it can be rendered with the "image/jpe
 A simple example to explain the process of dispatching/retrieving a captcha and its passphrase:
 
 ```php
-    // This file represents the "www.example.com/get_captcha_image" url
+    // This file represents the "www.example.com/get_captcha_image" url that generates our captcha
  
     // ...    
 
@@ -62,7 +62,7 @@ A simple example to explain the process of dispatching/retrieving a captcha and 
 An example of a form you need to validate, like a login form:
 
 ```html
-    <!-- ...  -->
+<!-- ...  -->
 
 <input type="email" name="email">
 <input type="password" name="password">
