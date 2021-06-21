@@ -226,9 +226,13 @@ class Captcha
         imagejpeg($this->captcha, null, $quality);
         imagedestroy($this->captcha);
     }
-
+    
     /**
-     * Image distortion
+     * @param $image
+     * @param $width
+     * @param $height
+     * @param $bg
+     * @return false|GdImage|resource
      */
     protected function distort($image, $width, $height, $bg)
     {
