@@ -48,8 +48,14 @@ class Captcha
      *
      * @param $passphrase
      */
-    public function __construct($passphrase)
+    public function __construct($passphrase = null)
     {
+        if(isset($passphrase)) {
+            $this->passphrase = is_array($passphrase) ? implode(" ", $passphrase) : $passphrase;
+        } else {
+            $this->passphrase = substr(rand(), 0, 5);
+        }
+        
         $this->passphrase = is_array($passphrase) ? implode(" ", $passphrase) : $passphrase;
 
         $path = realpath(dirname(__FILE__));
