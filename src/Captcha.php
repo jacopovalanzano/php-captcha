@@ -142,12 +142,14 @@ class Captcha
             imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
         }
 
+        // Distort created captcha
         $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
     }
 
     /**
      * Creates a captcha with PHP default fonts.
-     * You should use Captcha::createImage() when possible.
+     * This method does not need a font from a ttf file.
+     * Use Captcha::createImage() when possible.
      *
      * @param int $imgWidth
      * @param int $imgHeight
@@ -182,6 +184,7 @@ class Captcha
             imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
         }
 
+        // Distort created captcha
         $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
     }
 
