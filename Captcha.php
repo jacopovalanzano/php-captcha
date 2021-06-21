@@ -47,19 +47,30 @@ class Captcha
      * Captcha constructor.
      *
      * @param $passphrase
-     * @param array $fonts Full path of additional fonts.
      */
-    public function __construct($passphrase, array $fonts = [])
+    public function __construct($passphrase)
     {
         $this->passphrase = is_array($passphrase) ? implode(" ", $passphrase) : $passphrase;
 
         $path = realpath(dirname(__FILE__));
 
-        $this->fonts = array_merge([
-            "${path}/Fonts/Raleway-Black.ttf",
-            "${path}/Fonts/OpenSans-Bold.ttf",
-            "${path}/Fonts/Roboto-BlackItalic.ttf"
-        ], $fonts);
+        $this->fonts = [
+            "${path}/Fonts/captcha0.ttf",
+            "${path}/Fonts/captcha1.ttf",
+            "${path}/Fonts/captcha2.ttf",
+            "${path}/Fonts/captcha3.ttf",
+            "${path}/Fonts/captcha4.ttf"
+        ];
+    }
+
+    /**
+     * Adds new ttf fonts files to the list.
+     *
+     * @param array $fonts
+     */
+    public function addFonts($fonts)
+    {
+        $this->fonts = array_merge($this->fonts, $fonts);
     }
 
     /**

@@ -36,9 +36,17 @@ A simple example to explain the process of dispatching/retrieving a captcha and 
  
     // ...    
 
-    // By default, the captcha class returns 2 random words
-    // from the list provided.
-    $captcha = new Captcha();
+    // A list of words
+    $attributes = [ "easy", "green", "digital" ];
+
+    // One more list of words
+    $nouns = [ "compare", "dungeon", "clip" ];
+
+    // Compose a phrase
+    $words = $attributes[array_rand($attributes)]." ".$nouns[array_rand($nouns)];
+
+    // Create a new captcha with some random words
+    $captcha = new Captcha($words);
 
     // Add 2 lines over and 5 behind the text,
     // then build the image.
