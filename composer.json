@@ -1,0 +1,15 @@
+{
+  "name": "jacopovalanzano/PHP-Captcha",
+  "description": "A portable captcha.",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jacopo Valanzano",
+      "email": "jacopo.valanzano@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.1"
+  }
+}
