@@ -1,5 +1,5 @@
 {
-  "name": "jacopovalanzano/PHP-Captcha",
+  "name": "jacopovalanzano/php-captcha",
   "description": "A portable captcha.",
   "minimum-stability": "stable",
   "license": "MIT",
