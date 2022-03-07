@@ -18,7 +18,7 @@ Since the captcha is a binary jpeg image, it can be rendered with the "image/jpe
 
     // Add 3 lines over and 3 behind the text,
     // then build the image.
-    $captcha->addLinesFront(3)->addLinesBack(3)->build(175,50); // width, height
+    $captcha->linesFront(3)->linesBack(3)->build(175,50); // width, height
 
     // Returns a string containing the captcha passphrase
     $captcha->getPassphrase(); // Returns "My super difficult to read string."
@@ -49,7 +49,7 @@ A simple example to explain the process of dispatching/retrieving a captcha and 
 
     // Add 2 lines over and 5 behind the text,
     // then build the image.
-    $captcha->addLinesFront(2)->addLinesBack(5)->build(175,50); // width, height
+    $captcha->linesFront(2)->linesBack(5)->build(175,50); // width, height
 
     // Save the captcha to session, so it can be retrieved later... 
     $_SESSION["captcha_passphrase"] = $captcha->getPassphrase();
