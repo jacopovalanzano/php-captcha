@@ -1,8 +1,8 @@
 {
   "name": "jacopovalanzano/php-captcha",
   "description": "A portable captcha.",
-  "version": "1.6.21",
-  "type": "library",  
+  "version": "1.7.24",
+  "type": "library",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
@@ -12,6 +12,7 @@
     }
   ],
   "require": {
-      "php": "^7.3|^8.0"
+    "php": "^5.4|^7.0|^8.0",
+    "ext-gd": "^7.0"
   }
 }

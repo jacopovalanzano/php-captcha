@@ -51,12 +51,12 @@ class Captcha
     public function __construct($passphrase = null)
     {
         if(isset($passphrase)) {
-            $this->passphrase = is_array($passphrase) ? implode(" ", $passphrase) : $passphrase;
+            $this->passphrase = \is_array($passphrase) ? \implode(" ", $passphrase) : $passphrase;
         } else {
-            $this->passphrase = substr(rand(), 0, 5);
+            $this->passphrase = \substr(\md5(\rand()), 0, 5);
         }
-        
-        $path = realpath(dirname(__FILE__));
+
+        $path = \realpath(__DIR__);
 
         $this->fonts = [
             "${path}/Fonts/captcha0.ttf",
@@ -74,7 +74,17 @@ class Captcha
      */
     public function addFonts($fonts)
     {
-        $this->fonts = array_merge($this->fonts, $fonts);
+        $this->fonts = \array_merge($this->fonts, $fonts);
+    }
+
+    /**
+     * Used for phpUnit tests.
+     *
+     * @return array|string[]
+     */
+    public function getFonts()
+    {
+        return $this->fonts;
     }
 
     /**
@@ -82,68 +92,111 @@ class Captcha
      *
      * @param int $imgWidth
      * @param int $imgHeight
-     * @param int $fontSize
      */
-    public function build($imgWidth = 175, $imgHeight = 50, $fontSize = 18)
+    public function build($imgWidth = 175, $imgHeight = 50)
     {
-        $this->createImage($imgWidth, $imgHeight, $fontSize);
+        $this->createImage($imgWidth, $imgHeight);
     }
 
     /**
-     * Outputs a created captcha, including headers.
+     * Outputs the captcha, including headers.
      */
     public function out()
     {
+        \header('Content-Type: image/jpeg');
         $this->getCaptcha();
     }
 
     /**
+     * @return string
+     */
+    public function inline()
+    {
+        \header('Content-Type: text/html');
+        \ob_start();
+        $this->getCaptcha();
+        return 'data:image/jpeg;base64,' . \base64_encode(\ob_get_clean());
+    }
+
+    /**
+     * Renders the captcha image.
+     *
+     * @param int $quality Captcha image quality.
+     */
+    public function getCaptcha($quality = 100)
+    {
+        \imagejpeg($this->captcha, null, $quality);
+        \imagedestroy($this->captcha);
+    }
+
+    /**
+     * Returns the captcha passphrase
+     *
+     * @return string
+     */
+    public function getPassphrase()
+    {
+        return $this->passphrase;
+    }
+
+    /**
      * Creates a new captcha.
      *
      * @param int $imgWidth
      * @param int $imgHeight
-     * @param int $fontSize
      */
-    public function createImage($imgWidth = 175, $imgHeight = 50, $fontSize = 18)
+    public function createImage($imgWidth = 175, $imgHeight = 50)
     {
-        // Initialize an image
-        $this->captcha = imagecreatetruecolor($imgWidth, $imgHeight);
+        // Adjust font size:
+        $pwl = \strlen($this->getPassphrase());
 
-        // Select a random color and create a rectangle
-        $rcolor = imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255));
-        $rectangle = imagefilledrectangle($this->captcha, 0, 0, $imgWidth - 1, $imgHeight - 1, $rcolor);
+        // Calculate font size
+        $fontSize = ( \sqrt($imgWidth * $imgWidth - $imgHeight * $imgHeight) / $pwl );
 
-        // Select one more random color for our letters
-        $rcolor = imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255));
+        // Create an image
+        $this->captcha = \imagecreatetruecolor($imgWidth, $imgHeight);
+
+        // Select a random color for the background and create a rectangle
+        $bgcolor = \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255));
+
+        $textColor = $this->invertColor($bgcolor);
+
+        // random background size
+        \imagefilledrectangle($this->captcha, 0, 0, $imgWidth, $imgHeight, $bgcolor);
 
         // Create the text bounding (distances to fit container)
-        $textBox = imagettfbbox($fontSize, $rectangle, $this->fonts[rand(0, count($this->fonts)-1)], $this->passphrase);
+        $textBox = \imagettfbbox($fontSize, false, $this->fonts[\rand(0, \count($this->fonts)-1)], $this->passphrase);
 
-        $textWidth = abs(max($textBox[2], $textBox[4]));
+        $textWidth = \abs(\max($textBox[2], $textBox[4]));
 
-        $textHeight = abs(max($textBox[5], $textBox[7]));
+        $textHeight = \abs(\max($textBox[5], $textBox[7]));
 
-        $x = (imagesx($this->captcha) - $textWidth) / 2;
-        $y = (imagesy($this->captcha) + $textHeight) / 2;
-
-        // Creates lines behind the string.
+        // Create lines behind the text
         for($i=0;$i<$this->linesBack;$i++) {
-            imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+            $rcolor = [$textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
+            imagesetthickness($this->captcha, \rand(1, 2));
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[\rand(0,1)]);
         }
 
-        // Add shadow
-        imagettftext($this->captcha, $fontSize, $rectangle, $x+rand(-5,5), $y+rand(-5,5), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)), $this->fonts[rand(0,count($this->fonts)-1)], $this->passphrase);
+        // Retrieve space left in rectangle
+        $x = ((\imagesx($this->captcha) - $textWidth)  / 2);
+        $y = (\imagesy($this->captcha) + $textHeight) / 2;
 
-        //add the text
-        imagettftext($this->captcha, $fontSize, $rectangle, $x, $y, $rcolor, $this->fonts[rand(0,count($this->fonts)-1)], $this->passphrase);
+        // Select random font
+        $font = $this->fonts[\rand(0,\count($this->fonts)-1)];
 
-        // Creates lines that overlap the string.
+        // Add the text
+        \imagettftext($this->captcha, $fontSize, 0, $x, $y, $textColor, $font, $this->passphrase);
+
+        // Create lines that overlap the string
         for($i=0;$i<$this->linesFront;$i++) {
-            imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+            $rcolor = [$textColor, $textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
+            imagesetthickness($this->captcha, \rand(1, 2));
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[rand(0,2)]);
         }
 
         // Distort created captcha
-        $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+        $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, $bgcolor);
     }
 
     /**
@@ -158,34 +211,34 @@ class Captcha
     {
 
         // Initialize an image
-        $this->captcha = imagecreatetruecolor($imgWidth, $imgHeight);
+        $this->captcha = \imagecreatetruecolor($imgWidth, $imgHeight);
 
         // Select a random color and create a rectangle
-        $rcolor = imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255));
-        imagefilledrectangle($this->captcha, 0, 0, $imgWidth - 1, $imgHeight - 1, $rcolor);
+        $bgcolor = \imagecolorallocate($this->captcha, \rand(0,255), \rand(0,255), \rand(0,255));
+
+        $textColor = $this->invertColor($bgcolor);
+
+        \imagefilledrectangle($this->captcha, 0, 0, $imgWidth, $imgHeight, $bgcolor);
 
         // Creates lines behind the string.
         for($i=0;$i<$this->linesBack;$i++) {
-            imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $textColor);
         }
 
         // Calculate x and y coordinates
-        $x = rand(0, (imagesx($this->captcha)) - $imgWidth / 2);
-        $y = rand(0, (imagesy($this->captcha)) - $imgHeight / 2);
+        $x = \rand(0, (\imagesx($this->captcha)) - $imgWidth / 2);
+        $y = \rand(0, (\imagesy($this->captcha)) - $imgHeight / 2);
 
         // Creates the shadow of the string.
-        imagestring($this->captcha, 4, $x, $y, $this->passphrase, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+        \imagestring($this->captcha, 5, $x, $y, $this->passphrase, $textColor);
 
-        // Creates another string ±3px on top of the "shadow".
-        imagestring($this->captcha, 5, $x+rand(-1,1), $y+rand(-1,1), $this->passphrase, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
-
-        // Creates lines that overlap the string.
+        // Create lines that overlap the string.
         for($i=0;$i<$this->linesFront;$i++) {
-            imageline($this->captcha, rand(0, $imgWidth), rand(0, $imgHeight), rand(0, $imgWidth), rand(0, $imgHeight), imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $textColor);
         }
 
         // Distort created captcha
-        $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, imagecolorallocate($this->captcha, rand(0,255), rand(0,255), rand(0,255)));
+        $this->captcha = $this->distort($this->captcha, $imgWidth, $imgHeight, $bgcolor);
     }
 
     /**
@@ -213,28 +266,6 @@ class Captcha
     }
 
     /**
-     * Returns the captcha passphrase
-     *
-     * @return string
-     */
-    public function getPassphrase()
-    {
-        return $this->passphrase;
-    }
-
-    /**
-     * Renders the captcha image.
-     *
-     * @param int $quality Captcha image quality.
-     */
-    public function getCaptcha($quality = 100)
-    {
-        header('Content-Type: image/jpeg');
-        imagejpeg($this->captcha, null, $quality);
-        imagedestroy($this->captcha);
-    }
-    
-    /**
      * @param $image
      * @param $width
      * @param $height
@@ -243,34 +274,33 @@ class Captcha
      */
     protected function distort($image, $width, $height, $bg)
     {
-        $contents = imagecreatetruecolor($width, $height);
-        $X          = rand(0, $width);
-        $Y          = rand(0, $height);
-        $phase      = rand(0, 10);
-        $scale      = 1.1 + rand(0, 10000) / 30000;
+        $contents = \imagecreatetruecolor($width, $height);
+
+        // Divide by 100 (or so) to smooth out distortion rate
+        // Above rand(10+, ...) might cause too much distortion, below 5 might not be enough.
+        $phase = $this->rand(8, 5) / 100;
+
+        // random values for x-axis & y-axis distortion, adjust to increase/decrease distortion
+        $rndX = $this->rand(9, 6);
+        $rndY = $this->rand(8, 5);
+
+        // Iterate through each pixel of the x-axis (width)
         for ($x = 0; $x < $width; $x++) {
+            // Iterate through each pixel of the y-axis (height)
             for ($y = 0; $y < $height; $y++) {
-                $Vx = $x - $X;
-                $Vy = $y - $Y;
-                $Vn = sqrt($Vx * $Vx + $Vy * $Vy);
 
-                if ($Vn != 0) {
-                    $Vn2 = $Vn + 4 * sin($Vn / 30);
-                    $nX  = $X + ($Vx * $Vn2 / $Vn);
-                    $nY  = $Y + ($Vy * $Vn2 / $Vn);
-                } else {
-                    $nX = $X;
-                    $nY = $Y;
-                }
-                $nY = $nY + $scale * sin($phase + $nX * 0.2);
+                // Distortion
+                $nY = $y + ( $rndY + $phase ) * \sin($x * 0.1);
+                $nX = $x + ( $rndX + $phase ) * \sin($y * 0.1);
 
-                $p = $this->getCol($image, round($nX), round($nY), $bg);
+                // Gets the color of the pixel at given coordinate
+                $p = $this->getColor($image, $nX, $nY, $bg);
 
-                if ($p == 0) {
-                    $p = $bg;
-                }
-
-                imagesetpixel($contents, $x, $y, $p);
+                /**
+                 * Places the pixel $p where the x and y axis ($x $y) intersect.
+                 * "imagesetpixel draws a pixel at the specified coordinate."
+                 */
+                \imagesetpixel($contents, $x, $y, $p);
             }
         }
 
@@ -278,20 +308,67 @@ class Captcha
     }
 
     /**
+     * Returns pixel color of coordinate.
+     *
      * @param $image
      * @param $x
      * @param $y
      *
      * @return int
      */
-    protected function getCol($image, $x, $y, $background)
+    protected function getColor($image, $x, $y, $background)
     {
-        $L = imagesx($image);
-        $H = imagesy($image);
+        $L = \imagesx($image);
+        $H = \imagesy($image);
         if ($x < 0 || $x >= $L || $y < 0 || $y >= $H) {
             return $background;
         }
 
-        return imagecolorat($image, $x, $y);
+        return \imagecolorat($image, $x, $y);
+    }
+
+    /**
+     * Invert color hex.
+     *
+     * @param $hex
+     * @return string
+     */
+    protected function invertColor($hex){
+
+        $ihex = \dechex($hex);
+
+        $r = dechex(255 - round(\hexdec(\substr($ihex, 0,2))));
+        $g = dechex(255 - round(\hexdec(\substr($ihex, 2,2))));
+        $b = dechex(255 - round(\hexdec(\substr($ihex, 4,2))));
+
+        // If the color (rgb) has less than 2 characters, pad with zero
+        $padZero = function ($str) {
+            return \str_pad($str, 2, 0, \STR_PAD_LEFT);
+        };
+
+        // Pad with zero
+        $hex = $padZero($r) . $padZero($g) . $padZero($b);
+
+        // Convert hex to decimal
+        return hexdec($hex);
+    }
+
+    /**
+     * Generates a random number. The higher the $precision, the further from zero the numbers will be generated
+     * (not including zero).
+     *
+     * $precision must be:
+     * >= 1
+     * > $val
+     *
+     * @param $val
+     * @param int $precision
+     * @return int
+     */
+    protected function rand($val, $precision = 3)
+    {
+        while( (($r = \rand(-$val, $val)) <= $precision) && $r >= -$precision ) {}
+
+        return $r;
     }
 }
