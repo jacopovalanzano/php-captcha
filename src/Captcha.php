@@ -174,7 +174,7 @@ class Captcha
         // Create lines behind the text
         for($i=0;$i<$this->linesBack;$i++) {
             $rcolor = [$textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
-            imagesetthickness($this->captcha, \rand(1, 2));
+            \imagesetthickness($this->captcha, \rand(1, 2));
             \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[\rand(0,1)]);
         }
 
@@ -191,7 +191,7 @@ class Captcha
         // Create lines that overlap the string
         for($i=0;$i<$this->linesFront;$i++) {
             $rcolor = [$textColor, $textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
-            imagesetthickness($this->captcha, \rand(1, 2));
+            \imagesetthickness($this->captcha, \rand(1, 2));
             \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[rand(0,2)]);
         }
 
@@ -222,7 +222,8 @@ class Captcha
 
         // Creates lines behind the string.
         for($i=0;$i<$this->linesBack;$i++) {
-            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $textColor);
+            $rcolor = [$textColor, $textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[rand(0,2)]);
         }
 
         // Calculate x and y coordinates
@@ -234,7 +235,8 @@ class Captcha
 
         // Create lines that overlap the string.
         for($i=0;$i<$this->linesFront;$i++) {
-            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $textColor);
+            $rcolor = [$textColor, $textColor, \imagecolorallocate($this->captcha, \rand(100,255), \rand(100,255), \rand(100,255))];
+            \imageline($this->captcha, \rand(0, $imgWidth), \rand(0, $imgHeight), \rand(0, $imgWidth), \rand(0, $imgHeight), $rcolor[rand(0,2)]);
         }
 
         // Distort created captcha
@@ -337,9 +339,9 @@ class Captcha
 
         $ihex = \dechex($hex);
 
-        $r = dechex(255 - round(\hexdec(\substr($ihex, 0,2))));
-        $g = dechex(255 - round(\hexdec(\substr($ihex, 2,2))));
-        $b = dechex(255 - round(\hexdec(\substr($ihex, 4,2))));
+        $r = \dechex(255 - \round(\hexdec(\substr($ihex, 0,2))));
+        $g = \dechex(255 - \round(\hexdec(\substr($ihex, 2,2))));
+        $b = \dechex(255 - \round(\hexdec(\substr($ihex, 4,2))));
 
         // If the color (rgb) has less than 2 characters, pad with zero
         $padZero = function ($str) {
@@ -350,7 +352,7 @@ class Captcha
         $hex = $padZero($r) . $padZero($g) . $padZero($b);
 
         // Convert hex to decimal
-        return hexdec($hex);
+        return \hexdec($hex);
     }
 
     /**
