@@ -1,13 +1,31 @@
+<<<<<<< HEAD
 
 # PHP Captcha
 
 Portable PHP class for creating simple captchas.
 One file. Great for simple projects. 
+=======
+# PHP Captcha
+
+Portable PHP class for creating simple captchas.
+One file. Great for simple projects.
+>>>>>>> 33057d3 (	new file:   LICENSE)
 
 ![captcha1](https://i.imgur.com/CakXgDj.gif)
 
 ![captcha2](https://i.ibb.co/B6tZc0t/ezgif-4-5d353765b4.gif)
 
+<<<<<<< HEAD
+=======
+**NOTE**: this captcha is not a final solution to combat bots, but will stop avid and raging attackers.
+
+For comparison, below is an example of a *captcha* used by **tesla.com**:
+![tesla-captcha](https://i.imgur.com/tkcogKy.png)
+
+Microsoft ([live.com](live.com)):
+![live.com-captcha](https://i.imgur.com/Yy9qxbk.png)
+
+>>>>>>> 33057d3 (	new file:   LICENSE)
 ## Installation
 
 Install with composer, or use the contents of the **src** folder.
@@ -15,8 +33,15 @@ Install with composer, or use the contents of the **src** folder.
 ```bash  
 composer require jacopovalanzano/php-captcha  
 ```  
+<<<<<<< HEAD
 Requires PHP ^5.4 and [PHP-GD](https://www.php.net/manual/en/book.image.php).
 
+=======
+
+Requires PHP ^5.4 and [PHP-GD](https://www.php.net/manual/en/book.image.php).
+
+
+>>>>>>> 33057d3 (	new file:   LICENSE)
 ## Usage
 The captcha is a binary jpeg image, it can be rendered with the "image/jpeg" content-type header.
 ```php  
@@ -78,11 +103,22 @@ An example of a form you need to validate, like a login form:
 <input type="text" name="captcha_passphrase">  
 <input type="submit" value="send">  
 ```
+<<<<<<< HEAD
 Or 
 ```
 echo '<img src="' . $captcha->inline() . '">';
 ```
 Match ```$_SESSION["captcha_passphrase"]```
+=======
+
+Or 
+
+```
+echo '<img src="' . $captcha->inline() . '">';
+```
+
+Match ``$_SESSION["captcha_passphrase"]``
+>>>>>>> 33057d3 (	new file:   LICENSE)
 against the value passed from the input "captcha_passphrase" in the example above, eg:
 
 ```php  
@@ -92,6 +128,14 @@ against the value passed from the input "captcha_passphrase" in the example abov
     }  
 ```  
 
+<<<<<<< HEAD
+=======
+## Tests
+Tested with [GNU ocrad](https://www.gnu.org/software/ocrad/) and [Xevil](http://xevil.net)
+
+![xevil](https://i.imgur.com/xnlZsWV.gif)
+
+>>>>>>> 33057d3 (	new file:   LICENSE)
 ## Contributing
 Pull requests are welcome.
 
