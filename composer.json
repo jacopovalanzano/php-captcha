@@ -1,22 +1,15 @@
 {
   "name": "jacopovalanzano/php-captcha",
   "description": "A portable captcha.",
-<<<<<<< HEAD
-  "version": "1.7.25",
-  "type": "library",
-  "minimum-stability": "stable",
   "license": "MIT",
-=======
   "version": "1.7.26",
   "type": "library",
   "keywords": ["captcha", "recaptcha", "spam", "bot", "authentication"],
   "homepage": "https://github.com/jacopovalanzano/php-captcha",
   "license": "MIT",
-  "minimum-stability": "stable",
   "autoload": {
       "psr-4": { "": ["src/"] }
   },
->>>>>>> 33057d3 (	new file:   LICENSE)
   "authors": [
     {
       "name": "Jacopo Valanzano",
